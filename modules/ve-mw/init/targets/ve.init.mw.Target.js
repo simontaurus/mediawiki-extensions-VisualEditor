@@ -208,16 +208,23 @@ ve.init.mw.Target.static.parseDocument = function ( documentString, mode, sectio
 			if (section != null){
 				sectionNode = doc.body.querySelector( '[data-mw-section-id="' + section + '"]' );
 				if (!sectionNode){ //section does not exist
-					var $anchor = $(doc.body).find(".insert-new-section-below");
+					var $anchor = null;
+					var append = false;
+					var section_element = $(`<section data-mw-section-id="${section}" data-parsoid="{}"><h1 data-parsoid="{}"></h1><p data-parsoid="{}"></p>`);
+					$anchor = $(doc.body).find("#custom-ve-new-section-append-anchor");
+					if ($anchor.length) append = true; 
+					else $anchor = $(doc.body).find("#custom-ve-new-section-prepend-anchor");
 					if ($anchor.length){
-						console.log("anchor" + $anchor)
+						//console.log("anchor:");
+						//console.log($anchor)
 						$parent = $anchor.parent();
 						while(!$parent.parent().is($(doc.body))) $parent = $parent.parent(); //find top-level section below body
-						console.log("parent" + $parent);
-						$parent.append(`<section data-mw-section-id="${section}" data-parsoid="{}"><h1 data-parsoid="{}"></h1><p data-parsoid="{}"></p>`);
+						//console.log("parent:");
+						//console.log($parent);
+						if (append) $parent.after(section_element);
+						else $parent.before(section_element);
 					}
-					else $(doc.body).append(`<section data-mw-section-id="${section}" data-parsoid="{}"><h1 data-parsoid="{}"></h1>
-					<p data-parsoid="{}"></p>`);
+					else $(doc.body).append(section_element);
 				}
 				//console.log(doc.body.innerHTML);
 			}
