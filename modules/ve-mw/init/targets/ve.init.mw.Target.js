@@ -195,13 +195,32 @@ ve.init.mw.Target.prototype.createModelFromDom = function () {
  */
 ve.init.mw.Target.static.parseDocument = function ( documentString, mode, section, onlySection ) {
 	var doc, sectionNode;
+
 	if ( mode === 'source' ) {
 		// Parent method
 		doc = ve.init.mw.Target.super.static.parseDocument.call( this, documentString, mode );
 	} else {
 		// Parsoid documents are XHTML so we can use parseXhtml which fixed some IE issues.
 		doc = ve.parseXhtml( documentString );
+                //console.log(doc.body.innerHTML);
+
 		if ( section !== undefined ) {
+			if (section != null){
+				sectionNode = doc.body.querySelector( '[data-mw-section-id="' + section + '"]' );
+				if (!sectionNode){ //section does not exist
+					var $anchor = $(doc.body).find(".insert-new-section-below");
+					if ($anchor.length){
+						console.log("anchor" + $anchor)
+						$parent = $anchor.parent();
+						while(!$parent.parent().is($(doc.body))) $parent = $parent.parent(); //find top-level section below body
+						console.log("parent" + $parent);
+						$parent.append(`<section data-mw-section-id="${section}" data-parsoid="{}"><h1 data-parsoid="{}"></h1><p data-parsoid="{}"></p>`);
+					}
+					else $(doc.body).append(`<section data-mw-section-id="${section}" data-parsoid="{}"><h1 data-parsoid="{}"></h1>
+					<p data-parsoid="{}"></p>`);
+				}
+				//console.log(doc.body.innerHTML);
+			}
 			if ( onlySection ) {
 				sectionNode = doc.body.querySelector( '[data-mw-section-id="' + section + '"]' );
 				doc.body.innerHTML = '';
@@ -209,10 +228,12 @@ ve.init.mw.Target.static.parseDocument = function ( documentString, mode, sectio
 					doc.body.appendChild( sectionNode );
 				}
 			} else {
+				//console.log("strip");
 				// Strip Parsoid sections
 				mw.libs.ve.unwrapParsoidSections( doc.body, section );
 			}
 		}
+		//console.log(doc.body.innerHTML);
 		// Strip legacy IDs, for example in section headings
 		mw.libs.ve.stripParsoidFallbackIds( doc.body );
 		// Fix relative or missing base URL if needed
