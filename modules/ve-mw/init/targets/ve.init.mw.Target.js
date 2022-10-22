@@ -202,7 +202,7 @@ ve.init.mw.Target.static.parseDocument = function ( documentString, mode, sectio
 	} else {
 		// Parsoid documents are XHTML so we can use parseXhtml which fixed some IE issues.
 		doc = ve.parseXhtml( documentString );
-                //console.log(doc.body.innerHTML);
+        //console.log(doc.body.innerHTML);
 
 		if ( section !== undefined ) {
 			if (section != null){
@@ -210,7 +210,7 @@ ve.init.mw.Target.static.parseDocument = function ( documentString, mode, sectio
 				if (!sectionNode){ //section does not exist
 					var $anchor = null;
 					var append = false;
-					var section_element = $(`<section data-mw-section-id="${section}" data-parsoid="{}"><h1 data-parsoid="{}"></h1><p data-parsoid="{}"></p>`);
+					var section_element = $('<section data-mw-section-id="' + section + '" data-parsoid="{}"><h1 data-parsoid="{}"></h1><p data-parsoid="{}"></p>');
 					$anchor = $(doc.body).find("#custom-ve-new-section-append-anchor");
 					if ($anchor.length) append = true; 
 					else $anchor = $(doc.body).find("#custom-ve-new-section-prepend-anchor");
@@ -226,7 +226,26 @@ ve.init.mw.Target.static.parseDocument = function ( documentString, mode, sectio
 					}
 					else $(doc.body).append(section_element);
 				}
-				//console.log(doc.body.innerHTML);
+				/*
+				const template_section_headers = $(doc.body).find(".custom-ve-template-section-header");
+				
+				template_section_headers.each(function (){
+					const section_header = $(this);
+					const previous_section = section_header.closest('[data-mw-section-id="1"]');
+					const section_wrapper = $('<section data-mw-section-id="-1" data-parsoid="{}"></section>');
+					const siblings = section_header.nextAll();
+
+					section_wrapper.insertAfter(previous_section);
+					$(section_header).detach().appendTo(section_wrapper);
+					
+					siblings.each(function (){
+						$(this).detach().appendTo(section_wrapper);
+					});
+				});
+				//const template_section_headers = doc.body.querySelector(".custom-ve-template-section-header")
+				//doc.body.innerHTML = doc.body.innerHTML.replaceAll('<h1 class="custom-ve-template-section-header"', '</section><section data-mw-section-id="-1" data-parsoid="{}"><h1 class="custom-ve-template-section-header"');
+				console.log(doc.body.innerHTML);
+				*/
 			}
 			if ( onlySection ) {
 				sectionNode = doc.body.querySelector( '[data-mw-section-id="' + section + '"]' );
